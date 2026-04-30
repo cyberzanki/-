@@ -14,9 +14,11 @@ ENV PORT=10000
 RUN mkdir -p /data && chown node:node /data
 
 COPY --chown=node:node openclaw.json /data/openclaw.json
+COPY proxy.js /proxy.js
 
 EXPOSE 10000
 
 USER node
 
-CMD ["openclaw", "gateway", "--allow-unconfigured", "--bind", "lan", "--port", "10000"]
+# Gateway runs internally on 18789; proxy runs on 10000 (Render's exposed port)
+CMD sh -c "openclaw gateway --allow-unconfigured --bind lan --port 18789 & sleep 6 && exec node /proxy.js"
